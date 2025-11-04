@@ -4,6 +4,7 @@
 #include <SPI.h>
 #include <string>
 #include <TFT_eSPI.h>
+#include <XPT2046_Bitbang.h>
 #include <WiFi.h>
 #include <vector>
 
@@ -22,9 +23,39 @@
 #define SELECTED_BG_COLOR 0x0560
 
 TFT_eSPI screen = TFT_eSPI();
-SPIClass SD_SPI(HSPI);
+
+// Start the SPI for the touchscreen and init the touchscreen
+XPT2046_Bitbang touchscreen(XPT2046_MOSI, XPT2046_MISO, XPT2046_CLK, XPT2046_CS);
+
 std::vector<std::string> files;
 Cartridge* cart;
+
+uint16_t x, y; // coordenadas do toque
+
+// Estrutura para os botões virtuais
+struct TouchButton {
+    int x, y, w, h;
+    const char* label;
+};
+
+// Definição dos botões (layout simples)
+TouchButton buttons[] = {
+    // Direcional (lado esquerdo)
+    {40, 160, 30, 30, "^"},
+    {40, 210, 30, 30, "v"},
+    {10, 185, 30, 30, "<"},
+    {70, 185, 30, 30, ">"},
+
+    // Start e Select (centro)
+    {130, 210, 50, 25, "SELECT"},
+    {200, 210, 50, 25, "START"},
+
+    // Botões A e B (lado direito)
+    {270, 160, 30, 30, "A"},
+    {270, 200, 30, 30, "B"},
+};
+const int NUM_BUTTONS = sizeof(buttons) / sizeof(buttons[0]);
+
 void setup() 
 {
     // Turn off Wifi and Bluetooth to reduce CPU overhead
@@ -40,7 +71,8 @@ void setup()
     esp_bt_mem_release(ESP_BT_MODE_BTDM);
     esp_bt_controller_mem_release(ESP_BT_MODE_BTDM);
 
-    setupI2SDAC();
+    touchscreen.begin();
+    //setupI2SDAC();
 
     // Initialize TFT screen
     screen.begin();
@@ -55,18 +87,7 @@ void setup()
     // Initialize microsd card
     if(!initSD()) while (true);
 
-    // Setup buttons
-    pinMode(A_BUTTON, INPUT_PULLUP);
-    pinMode(B_BUTTON, INPUT_PULLUP);
-    pinMode(LEFT_BUTTON, INPUT_PULLUP);
-    pinMode(RIGHT_BUTTON, INPUT_PULLUP);
-    pinMode(UP_BUTTON, INPUT_PULLUP);
-    pinMode(DOWN_BUTTON, INPUT_PULLUP);
-    pinMode(START_BUTTON, INPUT_PULLUP);
-    pinMode(SELECT_BUTTON, INPUT_PULLUP);
-
     selectGame();
-
 }
 
 void loop() 
@@ -87,16 +108,16 @@ IRAM_ATTR void emulate()
     nes.connectScreen(&screen);
     nes.reset();
 
-    TaskHandle_t apu_task_handle;
-    xTaskCreatePinnedToCore(
-    apuTask,
-    "APU Task",
-    1024,
-    &nes.cpu.apu,
-    1,
-    &apu_task_handle,
-    0
-    );
+    //TaskHandle_t apu_task_handle;
+    // xTaskCreatePinnedToCore(
+    // apuTask,
+    // "APU Task",
+    // 2048,
+    // &nes.cpu.apu,
+    // 0,
+    // &apu_task_handle,
+    // 1
+    // );
 
     #ifdef DEBUG
         last_frame_time = esp_timer_get_time();
@@ -107,29 +128,35 @@ IRAM_ATTR void emulate()
     uint64_t next_frame = esp_timer_get_time();
     // Emulation Loop
     while (true) 
-    {
+    {   
         // Read button input
+        
+        drawTouchButtons();
+        
         nes.controller = 0;
-        if (digitalRead(A_BUTTON)      == LOW) nes.controller |= (Bus::CONTROLLER::A);
-        if (digitalRead(B_BUTTON)      == LOW) nes.controller |= (Bus::CONTROLLER::B);
-        if (digitalRead(SELECT_BUTTON) == LOW) nes.controller |= (Bus::CONTROLLER::Select);
-        if (digitalRead(UP_BUTTON)     == LOW) nes.controller |= (Bus::CONTROLLER::Up);
-        if (digitalRead(DOWN_BUTTON)   == LOW) nes.controller |= (Bus::CONTROLLER::Down);
-        if (digitalRead(LEFT_BUTTON)   == LOW) nes.controller |= (Bus::CONTROLLER::Left);
-        if (digitalRead(RIGHT_BUTTON)  == LOW) nes.controller |= (Bus::CONTROLLER::Right);
-        if (digitalRead(START_BUTTON)  == LOW) 
+
+        const char* label = getButtonTouched();
+
+        if (strcmp(label, "A") == 0) nes.controller |= (Bus::CONTROLLER::A);
+        if (strcmp(label, "B") == 0) nes.controller |= (Bus::CONTROLLER::B);
+        if (strcmp(label, "SELECT") == 0) nes.controller |= (Bus::CONTROLLER::Select);
+        if (strcmp(label, "^") == 0) nes.controller |= (Bus::CONTROLLER::Up);
+        if (strcmp(label, "v") == 0) nes.controller |= (Bus::CONTROLLER::Down);
+        if (strcmp(label, "<") == 0) nes.controller |= (Bus::CONTROLLER::Left);
+        if (strcmp(label, ">") == 0) nes.controller |= (Bus::CONTROLLER::Right);
+        if (strcmp(label, "START") == 0)
         {
             nes.controller |= (Bus::CONTROLLER::Start);
 
             // Start + Select opens the pause menu
-            if (digitalRead(SELECT_BUTTON) == LOW) 
+            if (strcmp(label, "SELECT") == 0) 
             {
-                vTaskSuspend(apu_task_handle);
+                //vTaskSuspend(apu_task_handle);
                 pauseMenu(&nes);
-                vTaskResume(apu_task_handle);
+                //vTaskResume(apu_task_handle);
                 next_frame = esp_timer_get_time() + FRAME_TIME;
             }
-        }
+        } 
 
         // Generate one frame
         nes.clock();
@@ -158,11 +185,19 @@ IRAM_ATTR void emulate()
     #undef FRAME_TIME
 }
 
+void drawTouchButtons() {
+    for (int i = 0; i < NUM_BUTTONS; i++) {
+        TouchButton &b = buttons[i];
+        screen.drawRect(b.x, b.y, b.w, b.h, TFT_WHITE);
+        screen.setTextColor(TFT_WHITE);
+        screen.drawCentreString(b.label, b.x + b.w / 2, b.y + (b.h / 2) - 6, 2);
+    }
+}
+
 bool initSD() 
 {
     Serial.println("Initializing SD...");
-    SD_SPI.begin(SD_SCLK_PIN, SD_MISO_PIN, SD_MOSI_PIN, SD_CS_PIN);
-    if (!SD.begin(SD_CS_PIN, SD_SPI, SD_FREQ)) 
+    if (!SD.begin()) 
     {
         #ifdef DEBUG
             Serial.println("SD Card Mount Failed");
@@ -192,6 +227,25 @@ bool initSD()
     }
 
     return true;
+}
+
+const char* getButtonTouched()
+{
+    TouchPoint touch = touchscreen.getTouch();
+
+    if (touch.zRaw != 0) {            
+
+        for (int i = 0; i < NUM_BUTTONS; i++) {
+            TouchButton &b = buttons[i];
+
+            if (touch.x > b.x && touch.x < b.x + b.w && touch.y > b.y && touch.y < b.y + b.h) {
+
+                return b.label;
+            }
+        }
+    }
+
+    return "";
 }
 
 void setupI2SDAC()
@@ -275,6 +329,7 @@ void drawFileList()
 
 void selectGame()
 {
+    drawTouchButtons();
     drawBars();
     drawWindowBox(2, 20, screen.width() - 4, screen.height() - 40);
     getNesFiles();
@@ -289,7 +344,15 @@ void selectGame()
 
         if (now - last_input_time > delay)
         {
-            if (digitalRead(UP_BUTTON) == LOW) 
+            const char* label = getButtonTouched();
+
+            if (strcmp(label, "A") == 0 && (selected >= 0 && selected < size))
+            {
+                cart = new Cartridge(("/" + files[selected]).c_str());
+                return;
+            }
+
+            else if (strcmp(label, "^") == 0)
             {
                 selected--;
                 if (selected < 0)
@@ -302,7 +365,7 @@ void selectGame()
                 last_input_time = now;
             }
 
-            if (digitalRead(DOWN_BUTTON) == LOW) 
+            else if (strcmp(label, "v") == 0)
             {
                 selected++; 
                 if (selected > (size - 1))
@@ -314,13 +377,6 @@ void selectGame()
                 drawFileList();
                 last_input_time = now;
             }
-            
-        }
-
-        if (digitalRead(A_BUTTON) == LOW && (selected >= 0 && selected < size))
-        {
-            cart = new Cartridge(("/" + files[selected]).c_str());
-            return;
         }
     }
 }
@@ -448,14 +504,16 @@ void pauseMenu(Bus* nes)
         int now = millis();
         if (now - last_input_time > delay)
         {
-            if (digitalRead(UP_BUTTON) == LOW) 
+            const char* label = getButtonTouched();
+
+            if (strcmp(label, "^") == 0) 
             {
                 select--;
                 if (select < 0) select = (num_items - 1);
                 last_input_time = now;
             }
 
-            if (digitalRead(DOWN_BUTTON) == LOW) 
+            if (strcmp(label, "v") == 0) 
             {
                 select++; 
                 if (select > (num_items - 1)) select = 0;
@@ -463,7 +521,7 @@ void pauseMenu(Bus* nes)
             }
 
             // Resume
-            if (digitalRead(A_BUTTON) == LOW) 
+            if (strcmp(label, "A") == 0) 
             {
                 switch (select)
                 {

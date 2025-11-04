@@ -102,7 +102,7 @@ https://espressif.github.io/arduino-esp32/package_esp32_index.json
 3. Download the ESP32 board support `v3.2.1` through <b> Tools → Board → Boards Manager </b>. 
 > [!IMPORTANT]
 > Make sure to download version 3.2.1, as different board versions may have worse performance.
-4. Download the `SdFat` and `TFT_eSPI` libraries from <b> Tools → Manage Libraries </b>.
+4. Download the `SdFat` and `TFT_eSPI` and `XPT2046_Bitbang_Slim` libraries from <b> Tools → Manage Libraries </b>.
 
 ### Step 3 - Configure TFT_eSPI
 The emulator uses a custom display configuration for the ST7789 display.

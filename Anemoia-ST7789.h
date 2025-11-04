@@ -1,5 +1,5 @@
-#define ST7789_DRIVER // Uncomment if using ST7789 display
-// #define ILI9341_DRIVER // Uncomment if using ILI9341 display
+// #define ST7789_DRIVER // Uncomment if using ST7789 display
+#define ILI9341_DRIVER // Uncomment if using ILI9341 display
 
 #define TFT_WIDTH  240
 #define TFT_HEIGHT 320
@@ -10,10 +10,10 @@
 #define SUPPORT_TRANSACTIONS
 #define USE_DMA
 
-#define TFT_MOSI   23
-#define TFT_MISO   -1
-#define TFT_SCLK   18
-#define TFT_CS     4
+#define TFT_MOSI   13
+#define TFT_MISO   12
+#define TFT_SCLK   14
+#define TFT_CS     15
 #define TFT_DC     2
 #define TFT_RST    -1
 
