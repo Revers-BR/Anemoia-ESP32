@@ -24,37 +24,18 @@
 
 TFT_eSPI screen = TFT_eSPI();
 
-// Start the SPI for the touchscreen and init the touchscreen
-XPT2046_Bitbang touchscreen(XPT2046_MOSI, XPT2046_MISO, XPT2046_CLK, XPT2046_CS);
+#ifdef USE_TOUCH_SCREEN
+    #include "virtual_joystick.h"
+
+    TFT_eSprite sprite = TFT_eSprite(&screen);
+    // Start the SPI for the touchscreen and init the touchscreen
+    XPT2046_Bitbang touchscreen(XPT2046_MOSI, XPT2046_MISO, XPT2046_CLK, XPT2046_CS);
+
+    VirtualJoystick vjoy(&screen, &sprite, &touchscreen);
+#endif
 
 std::vector<std::string> files;
 Cartridge* cart;
-
-uint16_t x, y; // coordenadas do toque
-
-// Estrutura para os botões virtuais
-struct TouchButton {
-    int x, y, w, h;
-    const char* label;
-};
-
-// Definição dos botões (layout simples)
-TouchButton buttons[] = {
-    // Direcional (lado esquerdo)
-    {40, 160, 30, 30, "^"},
-    {40, 210, 30, 30, "v"},
-    {10, 185, 30, 30, "<"},
-    {70, 185, 30, 30, ">"},
-
-    // Start e Select (centro)
-    {130, 210, 50, 25, "SELECT"},
-    {200, 210, 50, 25, "START"},
-
-    // Botões A e B (lado direito)
-    {270, 160, 30, 30, "A"},
-    {270, 200, 30, 30, "B"},
-};
-const int NUM_BUTTONS = sizeof(buttons) / sizeof(buttons[0]);
 
 void setup() 
 {
@@ -71,7 +52,6 @@ void setup()
     esp_bt_mem_release(ESP_BT_MODE_BTDM);
     esp_bt_controller_mem_release(ESP_BT_MODE_BTDM);
 
-    touchscreen.begin();
     //setupI2SDAC();
 
     // Initialize TFT screen
@@ -83,6 +63,10 @@ void setup()
     screen.fillScreen(BG_COLOR);
     screen.startWrite();
     screen.setSwapBytes(SCREEN_SWAP_BYTES);
+    
+    #ifdef USE_TOUCH_SCREEN
+        vjoy.begin(); // desenha os botões virtuais
+    #endif
 
     // Initialize microsd card
     if(!initSD()) while (true);
@@ -130,12 +114,9 @@ IRAM_ATTR void emulate()
     while (true) 
     {   
         // Read button input
-        
-        drawTouchButtons();
-        
         nes.controller = 0;
 
-        const char* label = getButtonTouched();
+        const char* label = vjoy.getButton();
 
         if (strcmp(label, "A") == 0) nes.controller |= (Bus::CONTROLLER::A);
         if (strcmp(label, "B") == 0) nes.controller |= (Bus::CONTROLLER::B);
@@ -181,17 +162,9 @@ IRAM_ATTR void emulate()
         uint64_t now = esp_timer_get_time();
         if (now < next_frame) ets_delay_us(next_frame - now);
         next_frame += FRAME_TIME;
+        vjoy.drawButtons();
     }
     #undef FRAME_TIME
-}
-
-void drawTouchButtons() {
-    for (int i = 0; i < NUM_BUTTONS; i++) {
-        TouchButton &b = buttons[i];
-        screen.drawRect(b.x, b.y, b.w, b.h, TFT_WHITE);
-        screen.setTextColor(TFT_WHITE);
-        screen.drawCentreString(b.label, b.x + b.w / 2, b.y + (b.h / 2) - 6, 2);
-    }
 }
 
 bool initSD() 
@@ -227,25 +200,6 @@ bool initSD()
     }
 
     return true;
-}
-
-const char* getButtonTouched()
-{
-    TouchPoint touch = touchscreen.getTouch();
-
-    if (touch.zRaw != 0) {            
-
-        for (int i = 0; i < NUM_BUTTONS; i++) {
-            TouchButton &b = buttons[i];
-
-            if (touch.x > b.x && touch.x < b.x + b.w && touch.y > b.y && touch.y < b.y + b.h) {
-
-                return b.label;
-            }
-        }
-    }
-
-    return "";
 }
 
 void setupI2SDAC()
@@ -312,24 +266,20 @@ void drawFileList()
         if (item >= size) break;
         const char* filename = files[item].c_str();
         int y = i * ITEM_HEIGHT + 32;
-        if (item == selected)
-        {
-            screen.setTextColor(SELECTED_TEXT_COLOR);
-            screen.drawString(filename, 14, y, 1);
-        }
-        else
-        {
-            screen.setTextColor(TEXT_COLOR); 
-            screen.drawString(filename, 14, y, 1);
-        }
+        
+        if (item == selected) screen.setTextColor(SELECTED_TEXT_COLOR);
+        else screen.setTextColor(TEXT_COLOR); 
+        
+        screen.drawString(filename, 14, y, 1);
     }
 
     prev_selected = selected;
+    vjoy.drawButtons();
 }
 
 void selectGame()
 {
-    drawTouchButtons();
+    vjoy.drawButtons();
     drawBars();
     drawWindowBox(2, 20, screen.width() - 4, screen.height() - 40);
     getNesFiles();
@@ -344,7 +294,7 @@ void selectGame()
 
         if (now - last_input_time > delay)
         {
-            const char* label = getButtonTouched();
+            const char* label = vjoy.getButton();
 
             if (strcmp(label, "A") == 0 && (selected >= 0 && selected < size))
             {
@@ -361,8 +311,6 @@ void selectGame()
                     scroll_offset = selected - MAX_ITEMS + 1;
                 }
                 else if (selected < scroll_offset)  scroll_offset = selected; 
-                drawFileList();
-                last_input_time = now;
             }
 
             else if (strcmp(label, "v") == 0)
@@ -374,9 +322,9 @@ void selectGame()
                     scroll_offset = selected;
                 }
                 else if (selected >= scroll_offset + MAX_ITEMS) scroll_offset = selected - MAX_ITEMS + 1;
-                drawFileList();
-                last_input_time = now;
             }
+            drawFileList();
+            last_input_time = now;
         }
     }
 }
@@ -504,7 +452,7 @@ void pauseMenu(Bus* nes)
         int now = millis();
         if (now - last_input_time > delay)
         {
-            const char* label = getButtonTouched();
+            const char* label = vjoy.getButton();
 
             if (strcmp(label, "^") == 0) 
             {
