@@ -5,6 +5,7 @@
 #define CONTROLLER_GPIO 
 //#define CONTROLLER_NES
 //#define CONTROLLER_SNES
+// #define CONTROLLER_PSX
 
 // MicroSD card configuration
 #define SD_FREQ 80000000
@@ -39,6 +40,12 @@
 #define CONTROLLER_SNES_CLK 5
 #define CONTROLLER_SNES_LATCH 19
 #define CONTROLLER_SNES_DATA 21
+
+// PS1/PS2 controller pins
+#define CONTROLLER_PSX_DATA 5
+#define CONTROLLER_PSX_COMMAND 19
+#define CONTROLLER_PSX_ATTENTION 21
+#define CONTROLLER_PSX_CLK 22
 
 // Sound sample rate
 #define SAMPLE_RATE 44100

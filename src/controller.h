@@ -18,4 +18,9 @@ void initController();
 uint8_t controllerRead();
 bool isDownPressed(CONTROLLER button);
 
+uint8_t NESControllerRead();
+uint8_t SNESControllerRead();
+uint8_t PSXControllerRead();
+uint8_t PSXTransferByte(uint8_t byte);
+
 #endif
