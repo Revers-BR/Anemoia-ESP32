@@ -7,7 +7,7 @@ uint8_t controllerRead()
 {
     uint8_t state = 0;
 
-#if defined(CONTROLLER_GPIO)
+#if CONTROLLER_TYPE == 0
     if (digitalRead(A_BUTTON)      == LOW) state |= CONTROLLER::A;
     if (digitalRead(B_BUTTON)      == LOW) state |= CONTROLLER::B;
     if (digitalRead(SELECT_BUTTON) == LOW) state |= CONTROLLER::Select;
@@ -17,13 +17,13 @@ uint8_t controllerRead()
     if (digitalRead(LEFT_BUTTON)   == LOW) state |= CONTROLLER::Left;
     if (digitalRead(RIGHT_BUTTON)  == LOW) state |= CONTROLLER::Right;
 
-#elif defined(CONTROLLER_NES)
+#elif CONTROLLER_TYPE == 1
     state = NESControllerRead();
 
-#elif defined(CONTROLLER_SNES)
+#elif CONTROLLER_TYPE == 2
     state = SNESControllerRead();
 
-#elif defined(CONTROLLER_PSX)
+#elif CONTROLLER_TYPE == 3
     state = PSXControllerRead();
 
 #else
@@ -40,7 +40,7 @@ bool isDownPressed(CONTROLLER button)
 
 void initController()
 {
-#if defined(CONTROLLER_GPIO)
+#if CONTROLLER_TYPE == 0
     pinMode(A_BUTTON, INPUT_PULLUP);
     pinMode(B_BUTTON, INPUT_PULLUP);
     pinMode(LEFT_BUTTON, INPUT_PULLUP);
@@ -50,17 +50,17 @@ void initController()
     pinMode(START_BUTTON, INPUT_PULLUP);
     pinMode(SELECT_BUTTON, INPUT_PULLUP);
 
-#elif defined(CONTROLLER_NES)
+#elif CONTROLLER_TYPE == 1
     pinMode(CONTROLLER_NES_CLK, OUTPUT);
     pinMode(CONTROLLER_NES_LATCH, OUTPUT);
     pinMode(CONTROLLER_NES_DATA, INPUT);
 
-#elif defined(CONTROLLER_SNES)
+#elif CONTROLLER_TYPE == 2
     pinMode(CONTROLLER_SNES_CLK, OUTPUT);
     pinMode(CONTROLLER_SNES_LATCH, OUTPUT);
     pinMode(CONTROLLER_SNES_DATA, INPUT);
 
-#elif defined(CONTROLLER_PSX)
+#elif CONTROLLER_TYPE == 3
     pinMode(CONTROLLER_PSX_DATA, INPUT_PULLUP);
     pinMode(CONTROLLER_PSX_COMMAND, OUTPUT);
     pinMode(CONTROLLER_PSX_ATTENTION, OUTPUT);

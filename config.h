@@ -1,11 +1,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// Controller configuration (define one only)
-#define CONTROLLER_GPIO 
-//#define CONTROLLER_NES
-//#define CONTROLLER_SNES
-// #define CONTROLLER_PSX
+// Controller Configuration
+// 0 = CONTROLLER_GPIO, 1 = CONTROLLER_NES, 
+// 2 = CONTROLLER_SNES, 3 = CONTROLLER_PSX
+#define CONTROLLER_TYPE 0
 
 // MicroSD card configuration
 #define SD_FREQ 80000000
