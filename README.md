@@ -107,9 +107,9 @@ Feel free to open an issue if a game has glitches or fails to boot.
 | Input    | GPIO25         |
               
 ## Controller
-There are currently three input methods: GPIO tactile push buttons, NES controller, and SNES controller
+There are currently three input methods: Tactile push buttons, an NES/SNES controller, and a PS1/PS2 controller.
 
-GPIO Tactile Push Buttons
+### Tactile Push Buttons
 | Signal   | ESP32 Pins     |
 |----------|----------------|
 | A        | GPIO22 & GND   |
@@ -122,16 +122,29 @@ GPIO Tactile Push Buttons
 | Select   | GPIO27 & GND   |
 <br>
 
-NES/SNES controller
+### NES/SNES controller
 
-<img width="338" height="187" alt="NesSnesPinout" src="https://github.com/user-attachments/assets/15c992a0-cdb9-4662-91be-3cf615ce1b41"/>
+<img width="338" height="187" alt="NES/SNES controller Pinout" src="https://github.com/user-attachments/assets/15c992a0-cdb9-4662-91be-3cf615ce1b41"/>
 
 | Signal   | ESP32 Pins     |
 |----------|----------------|
-| CLK      | GPIO5          |
+| Clock    | GPIO5          |
 | Latch    | GPIO19         |
-| Data     | GPI21          |
+| Data     | GPIO21         |
 <br>
+
+### PS1/PS2 controller
+
+<img width="338" alt="PS1/PS2 controller Pinout" src="https://github.com/user-attachments/assets/f1960910-e42b-432b-a3c2-ec0165d14599"/>
+
+| Signal    | ESP32 Pins     |
+|-----------|----------------|
+| Data      | GPIO5          |
+| Command   | GPIO19         |
+| Attention | GPIO21         |
+| Clock     | GPIO22         |
+<br>
+
 
 Also connect the power and ground lines if using a controller. 
 Most controllers should work fine from 3.3V power supply. 
