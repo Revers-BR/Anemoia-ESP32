@@ -98,14 +98,12 @@ IRAM_ATTR uint8_t* Cartridge::ppuReadPtr(uint16_t addr)
 
 void Cartridge::ppuScanline()
 {
-    if (mapper.vtable->scanline)
-        mapper.vtable->scanline(&mapper);
+    mapper.vtable->scanline(&mapper);
 }
 
 void Cartridge::cpuCycle(int cycles)
 {
-    if (mapper.vtable->cycle)
-        mapper.vtable->cycle(&mapper, cycles);
+    mapper.vtable->cycle(&mapper, cycles);
 }
 
 void Cartridge::reset()

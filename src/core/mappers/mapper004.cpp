@@ -274,7 +274,7 @@ const MapperVTable Mapper004_vtable =
     Mapper004_ppuWrite,
     Mapper004_ppuReadPtr,
 	Mapper004_scanline,
-	nullptr,
+    mapperNoCycle,
 	Mapper004_reset,
 	Mapper004_dumpState,
 	Mapper004_loadState,

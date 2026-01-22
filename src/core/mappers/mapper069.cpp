@@ -241,7 +241,7 @@ const MapperVTable Mapper069_vtable =
     Mapper069_ppuRead,
     Mapper069_ppuWrite,
     Mapper069_ppuReadPtr,
-	nullptr,
+    mapperNoScanline,    
     Mapper069_cycle,
 	Mapper069_reset,
 	Mapper069_dumpState,
