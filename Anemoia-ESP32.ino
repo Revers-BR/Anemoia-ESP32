@@ -192,7 +192,14 @@ void setupI2SDAC()
     };
 
     i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL);
-    i2s_set_dac_mode(I2S_DAC_CHANNEL_RIGHT_EN);
+    #if DAC_PIN == 0
+        i2s_set_dac_mode(I2S_DAC_CHANNEL_RIGHT_EN);
+    #elif DAC_PIN == 1
+        i2s_config.channel_format = I2S_CHANNEL_FMT_ONLY_LEFT;
+        i2s_set_dac_mode(I2S_DAC_CHANNEL_LEFT_EN);
+    #else
+        #error "Invalid DAC PIN is used."
+    #endif
 }
 
 void apuTask(void* param) 

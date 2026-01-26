@@ -46,6 +46,8 @@
 #define CONTROLLER_PSX_ATTENTION 21
 #define CONTROLLER_PSX_CLK 22
 
+#define DAC_PIN 1 // 0 = GPIO25, 1 = GPIO26
+
 // Sound sample rate
 #define SAMPLE_RATE 44100
 
