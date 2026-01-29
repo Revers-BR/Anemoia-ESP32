@@ -32,8 +32,8 @@ compiler.sdk.path.windows={tools.esp32-arduino-libs.path}\{build.mcu}
 
 # EXPERIMENTAL feature: optimization flags
 #  - this is alpha and may be subject to change without notice
-compiler.optimization_flags=-Ofast -ffunction-sections -fdata-sections -fstrict-aliasing -funroll-loops -fjump-tables -ftree-switch-conversion -flto -mlongcalls
-compiler.optimization_flags.release=-Ofast -ffunction-sections -fdata-sections -fstrict-aliasing -funroll-loops -fjump-tables -ftree-switch-conversion -flto -mlongcalls
+compiler.optimization_flags=-Ofast -ffunction-sections -fdata-sections -funroll-loops -fjump-tables -ftree-switch-conversion -fno-tree-vectorize -frename-registers -fno-plt -flto -mlongcalls
+compiler.optimization_flags.release=-Ofast -ffunction-sections -fdata-sections -funroll-loops -fjump-tables -ftree-switch-conversion -fno-tree-vectorize -frename-registers -fno-plt -flto -mlongcalls
 compiler.optimization_flags.debug=-Og -g3
 
 # Arduino Compile Warning Levels
@@ -66,8 +66,8 @@ compiler.ar.cmd={compiler.prefix}gcc-ar
 compiler.size.cmd={compiler.prefix}size
 
 # These can be overridden in platform.local.txt
-compiler.c.extra_flags=-Ofast -ffunction-sections -fdata-sections -fstrict-aliasing -funroll-loops -flto
-compiler.cpp.extra_flags=-Ofast -ffunction-sections -fdata-sections -fstrict-aliasing -fno-exceptions -fno-rtti -funroll-loops -flto -DOPTIMIZATION_FLAGS
+compiler.c.extra_flags=-Ofast -ffunction-sections -fdata-sections -funroll-loops -fno-tree-vectorize -frename-registers -fno-plt -flto 
+compiler.cpp.extra_flags=-Ofast -ffunction-sections -fdata-sections -fno-exceptions -fno-rtti -funroll-loops -fno-tree-vectorize -frename-registers -fno-plt -flto -DOPTIMIZATION_FLAGS
 compiler.S.extra_flags=-Ofast
 compiler.c.elf.extra_flags=-Wl,--gc-sections -flto
 compiler.ar.extra_flags=
