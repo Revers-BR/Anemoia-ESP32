@@ -85,29 +85,29 @@ IRAM_ATTR void Bus::clock()
     // 1 scanline == ~113.67 CPU clocks, so for every 3 scanlines, two scanlines will have an extra CPU clock
     for (ppu_scanline = 0; ppu_scanline < 240; ppu_scanline += 3)
     {
+        cpu.clock(113);
         #ifndef FRAMESKIP
             ppu.renderScanline(ppu_scanline);
         #else
             if (frame_latch) { ppu.renderScanline(ppu_scanline); }
             else { ppu.fakeSpriteHit(ppu_scanline); }
         #endif
-        cpu.clock(113);
 
+        cpu.clock(114);
         #ifndef FRAMESKIP
             ppu.renderScanline(ppu_scanline + 1);
         #else
             if (frame_latch) { ppu.renderScanline(ppu_scanline + 1); }
             else { ppu.fakeSpriteHit(ppu_scanline + 1); }
         #endif
-        cpu.clock(114);
 
+        cpu.clock(114);
         #ifndef FRAMESKIP
             ppu.renderScanline(ppu_scanline + 2);
         #else
             if (frame_latch) { ppu.renderScanline(ppu_scanline + 2); }
             else { ppu.fakeSpriteHit(ppu_scanline + 2); }
         #endif
-        cpu.clock(114);
     }
 
     // Setup for the next frame
