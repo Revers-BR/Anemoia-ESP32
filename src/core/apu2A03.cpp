@@ -3,6 +3,11 @@
 #include "cpu6502.h"
 
 DMA_ATTR uint16_t Apu2A03::audio_buffer[AUDIO_BUFFER_SIZE * 2];
+constexpr uint8_t Apu2A03::duty_sequences[4][8];
+constexpr uint8_t Apu2A03::length_counter_lookup[32];
+constexpr uint8_t Apu2A03::triangle_sequence[32];
+constexpr uint16_t Apu2A03::noise_period_lookup[16];
+constexpr uint16_t Apu2A03::DMC_rate_lookup[16];
 
 Apu2A03::Apu2A03()
 {
@@ -250,7 +255,6 @@ IRAM_ATTR uint8_t Apu2A03::cpuRead(uint16_t addr)
 	if (addr == 0x4015)
 	{
 		IRQ = false;
-		data = 0x00;
 	}
 	return data;
 }
@@ -262,7 +266,6 @@ IRAM_ATTR void Apu2A03::clock()
     pulseChannelClock(pulse2.seq, pulse2_enable);
     noiseChannelClock(noise, noise_enable);
     DMCChannelClock(DMC, DMC_enable);
-	triangleChannelClock(triangle, triangle_enable);
 	triangleChannelClock(triangle, triangle_enable);
 
     switch (clock_counter)
@@ -339,62 +342,55 @@ IRAM_ATTR void Apu2A03::clock()
         break;
     }
 
-	// Mute sound channels if muted
-	if (pulse1.sweep.mute || pulse1.seq.reload < 8 || pulse1.len_counter.timer == 0)
-	{
-		pulse1.seq.output = 0;
-		pulse1.env.output = 0;
-	}
-	if (pulse2.sweep.mute || pulse2.seq.reload < 8 || pulse2.len_counter.timer == 0)
-	{
-		pulse2.seq.output = 0;
-		pulse2.env.output = 0;
-	}
-	// Silencing the triangle channel when triangle.seq.reload < 2 is considered less accurate emulation,
-	// but eliminates high frequencies and popping
-	// if (!triangle_enable || triangle.len_counter.timer == 0 || triangle.seq.reload < 2) 
-	// {
-	// 	triangle.seq.output = 0;
-	// 	triangle.env.output = 0;
-	// }
-
 	// Put sound channels output into audio buffers
 	// Generate sample every 20.29221088 clocks
 	// (1.789773 MHz / 2) / 44100 Hz
+	pulse_hz += SAMPLE_RATE;
 	if (pulse_hz > 894886)
 	{
+		// Mute sound channels if muted
+		if (pulse1.sweep.mute || pulse1.seq.reload < 8 || pulse1.len_counter.timer == 0)
+		{
+			pulse1.seq.output = 0;
+			pulse1.env.output = 0;
+		}
+		if (pulse2.sweep.mute || pulse2.seq.reload < 8 || pulse2.len_counter.timer == 0)
+		{
+			pulse2.seq.output = 0;
+			pulse2.env.output = 0;
+		}
+		// Silencing the triangle channel when triangle.seq.reload < 2 is considered less accurate emulation,
+		// but eliminates high frequencies and popping
+		// if (!triangle_enable || triangle.len_counter.timer == 0 || triangle.seq.reload < 2) 
+		// {
+		// 	triangle.seq.output = 0;
+		// 	triangle.env.output = 0;
+		// }
 		generateSample();
 		pulse_hz -= 894886;
 	}
-
-    // if (pulse_hz > 1073863)
-	// {
-	// 	generateSample();
-	// 	pulse_hz -= 1073863;
-	// }
-    
-	pulse_hz += SAMPLE_RATE;
 	clock_counter++;
 }
 
-IRAM_ATTR void Apu2A03::generateSample()
+inline void Apu2A03::generateSample()
 {
 	#if DAC_PIN == 0
     	uint16_t index = (buffer_index << 1); 
 	#elif DAC_PIN == 1
     	uint16_t index = (buffer_index << 1) + 1; 
 	#endif
-    audio_buffer[index] = 0;
-	audio_buffer[index] += pulse1.seq.output ? pulse1.env.output : 0;
-	audio_buffer[index] += pulse2.seq.output ? pulse2.env.output: 0;
-	audio_buffer[index] += triangle.seq.output;
-	audio_buffer[index] += DMC.output_unit.output_level;
+	uint16_t sample = 0;
+	sample += pulse1.seq.output ? pulse1.env.output : 0;
+	sample += pulse2.seq.output ? pulse2.env.output: 0;
+	sample += triangle.seq.output;
+	sample += DMC.output_unit.output_level;
 
 	if (!(noise.shift_register & 0x01) && noise.len_counter.timer > 0)
-		audio_buffer[index] += noise.env.output;
-
-	if (audio_buffer[index] > 255) audio_buffer[index] = 255;
-    audio_buffer[index] <<= 8;
+		sample += noise.env.output;
+		
+	// audio_buffer[index] = (uint8_t)((audio_buffer[index] * audio_volume) + 0.5f);
+	sample &= 0xFF;
+    audio_buffer[index] = sample << 8;	
 
 	// Reset audio buffer index once filled
 	buffer_index++;
@@ -407,7 +403,7 @@ IRAM_ATTR void Apu2A03::generateSample()
     }
 }
 
-IRAM_ATTR void Apu2A03::pulseChannelClock(sequencerUnit& seq, bool enable)
+inline void Apu2A03::pulseChannelClock(sequencerUnit& seq, bool enable)
 {
 	if (!enable) return;
 
@@ -417,32 +413,33 @@ IRAM_ATTR void Apu2A03::pulseChannelClock(sequencerUnit& seq, bool enable)
 		seq.timer = seq.reload;
 		// Shift duty cycle with wrapping
 		seq.output = duty_sequences[seq.duty_cycle][seq.cycle_position];
-		seq.cycle_position++;
-		if (seq.cycle_position >= 8) seq.cycle_position = 0;
+		seq.cycle_position = (seq.cycle_position + 1) & 7;
 	}
 }
 
-IRAM_ATTR void Apu2A03::triangleChannelClock(triangleChannel& triangle, bool enable)
+inline void Apu2A03::triangleChannelClock(triangleChannel& triangle, bool enable)
 {
 	if (!enable) return; // Temp
 
-	triangle.seq.timer--;
-	if (triangle.seq.timer == 0)
+	for (int i = 0; i < 2; i++)
 	{
-		triangle.seq.timer = triangle.seq.reload;
-		if (!(triangle.len_counter.timer > 0 && triangle.lin_counter.counter > 0))
-			return;
-
-		if (triangle.seq.reload >= 2)
+		triangle.seq.timer--;
+		if (triangle.seq.timer == 0)
 		{
-			triangle.seq.output = triangle_sequence[triangle.seq.duty_cycle];
-			triangle.seq.duty_cycle++;
-			if (triangle.seq.duty_cycle >= 32) triangle.seq.duty_cycle = 0;
+			triangle.seq.timer = triangle.seq.reload;
+			if (!(triangle.len_counter.timer > 0 && triangle.lin_counter.counter > 0))
+				return;
+
+			if (triangle.seq.reload >= 2)
+			{
+				triangle.seq.output = triangle_sequence[triangle.seq.duty_cycle];
+				triangle.seq.duty_cycle = (triangle.seq.duty_cycle + 1) & 31;
+			}
 		}
 	}
 }
 
-IRAM_ATTR void Apu2A03::noiseChannelClock(noiseChannel& noise, bool enable)
+inline void Apu2A03::noiseChannelClock(noiseChannel& noise, bool enable)
 {   
 	if (!enable) return; // Temp
 
@@ -457,7 +454,7 @@ IRAM_ATTR void Apu2A03::noiseChannelClock(noiseChannel& noise, bool enable)
 	}
 }
 
-IRAM_ATTR void Apu2A03::DMCChannelClock(DMCChannel& DMC, bool enable)
+inline void Apu2A03::DMCChannelClock(DMCChannel& DMC, bool enable)
 {
 	if (!enable) return;
 
@@ -503,7 +500,7 @@ IRAM_ATTR void Apu2A03::DMCChannelClock(DMCChannel& DMC, bool enable)
 	}
 }
 
-IRAM_ATTR void Apu2A03::soundChannelEnvelopeClock(envelopeUnit& envelope)
+inline void Apu2A03::soundChannelEnvelopeClock(envelopeUnit& envelope)
 {
 	if (envelope.start_flag)
 	{
@@ -526,7 +523,7 @@ IRAM_ATTR void Apu2A03::soundChannelEnvelopeClock(envelopeUnit& envelope)
 	else envelope.output = envelope.decay_level_counter;
 }
 
-IRAM_ATTR void Apu2A03::soundChannelSweeperClock(pulseChannel& channel)
+inline void Apu2A03::soundChannelSweeperClock(pulseChannel& channel)
 {
 	// Calculate the target period
 	channel.sweep.change = (channel.seq.reload >> channel.sweep.shift_count);
@@ -560,13 +557,13 @@ IRAM_ATTR void Apu2A03::soundChannelSweeperClock(pulseChannel& channel)
 	}
 }
 
-IRAM_ATTR void Apu2A03::soundChannelLengthCounterClock(length_counter& len_counter)
+inline void Apu2A03::soundChannelLengthCounterClock(length_counter& len_counter)
 {
-	if (len_counter.timer > 0 && !len_counter.halt)
+	if (!len_counter.halt && len_counter.timer > 0)
 		len_counter.timer--;
 }
 
-IRAM_ATTR void Apu2A03::linearCounterClock(linear_counter& lin_counter)
+inline void Apu2A03::linearCounterClock(linear_counter& lin_counter)
 {
 	if (lin_counter.reload_flag)
 		lin_counter.counter = lin_counter.reload;
