@@ -493,7 +493,10 @@ inline void Ppu2C02::finishScanline(uint16_t scanline)
 {
     if (mask.render_background || mask.render_sprite) 
         cart->ppuScanline();
-    memcpy(ptr_display + (scanline_counter * SCANLINE_SIZE), ptr_buffer, SCANLINE_SIZE * sizeof(uint16_t));
+    uint32_t* display = (uint32_t*)(ptr_display + (scanline_counter * SCANLINE_SIZE));
+    uint32_t* buffer = (uint32_t*)ptr_buffer;
+    for (int i = 0, size = (SCANLINE_SIZE >> 1); i < size; i++) 
+        display[i] = buffer[i];
     scanline_counter++;
     if (scanline_counter >= SCANLINES_PER_BUFFER) 
     { 
