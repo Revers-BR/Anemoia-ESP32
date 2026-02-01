@@ -92,13 +92,27 @@ void UI::getNesFiles()
 
 void UI::drawFileList()
 {
-    if (prev_selected != selected) screen->fillRect(10, 32, screen->width() - 20, screen->height() - 64, BG_COLOR);
+    if (prev_selected != selected) 
+        screen->fillRect(10, 32, screen->width() - 20, screen->height() - 64, BG_COLOR);
+
     const int size = files.size();
     for (int i = 0; i < max_items; i++)
     {
         int item = i + scroll_offset;
         if (item >= size) break;
-        const char* filename = files[item].c_str();
+
+        std::string file = files[item];
+        int maxWidth = screen->width() - 28;
+        while (screen->textWidth(file.c_str()) > maxWidth)
+        {
+            file.pop_back();
+        }
+        if (file.size() < files[item].size())
+        {
+            file.replace(file.size()-3, 3, "...");
+        }
+
+        const char* filename = file.c_str();
         int y = i * ITEM_HEIGHT + 32;
         if (item == selected)
         {
