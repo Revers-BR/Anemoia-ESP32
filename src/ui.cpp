@@ -13,7 +13,7 @@ Cartridge* UI::selectGame()
 {
     unsigned int last_input_time = 0;
     constexpr unsigned int delay = 250; 
-    max_items = (screen->width() - 56) / ITEM_HEIGHT;
+    max_items = (screen->height() - 56) / ITEM_HEIGHT;
 
     drawWindowBox(2, 20, screen->width() - 4, screen->height() - 40);
     drawBars();
