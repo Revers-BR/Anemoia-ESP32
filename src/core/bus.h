@@ -21,7 +21,7 @@ public:
     Ppu2C02 ppu;
     Cartridge* cart;
     uint8_t RAM[2048];
-    uint8_t controller;
+    uint8_t controller = 0x00;
 
     void cpuWrite(uint16_t addr, uint8_t data);
     uint8_t cpuRead(uint16_t addr);

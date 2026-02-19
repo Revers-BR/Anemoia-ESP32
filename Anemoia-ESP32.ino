@@ -82,10 +82,21 @@ IRAM_ATTR void emulate()
     xTaskCreatePinnedToCore(
     apuTask,
     "APU Task",
-    1024,
+    768,
     &nes.cpu.apu,
     1,
     &apu_task_handle,
+    0
+    );
+
+    TaskHandle_t polling_task_handle;
+    xTaskCreatePinnedToCore(
+    pollingTask,
+    "Polling Task",
+    768,
+    &nes,
+    1,
+    &polling_task_handle,
     0
     );
 
@@ -99,10 +110,6 @@ IRAM_ATTR void emulate()
     // Emulation Loop
     while (true) 
     {
-        // Read button input
-        nes.controller = 0;
-        nes.controller = controllerRead();
-
         // Start + Select opens the pause menu
         if ((nes.controller & CONTROLLER::Start) && (nes.controller & CONTROLLER::Select)) 
         {
@@ -214,4 +221,21 @@ void apuTask(void* param)
     {
         apu->clock();
     }
+}
+
+void pollingTask(void* param)
+{
+    Bus* nes = (Bus*)param;
+    const TickType_t frameTicks = pdMS_TO_TICKS(1000 / 60);
+    TickType_t lastWakeTime = xTaskGetTickCount();
+
+    while (true)
+    {
+        // Read button input
+        nes->controller = 0;
+        nes->controller = controllerRead();
+
+        vTaskDelayUntil(&lastWakeTime, frameTicks);
+    }
+    
 }
