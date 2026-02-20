@@ -67,21 +67,21 @@ IRAM_ATTR void Ppu2C02::cpuWrite(uint16_t addr, uint8_t data)
 {
     switch (addr)
     {
-    case 0x2000: // PPUCTRL
+    case 0x0000: // PPUCTRL
         control.reg = data;
         t.nametable_x = control.nametable_x;
         t.nametable_y = control.nametable_y;
         break;
-    case 0x2001: // PPUMASK
+    case 0x0001: // PPUMASK
         mask.reg = data;
         break;
-    case 0x2003: // OAMADDR
+    case 0x0003: // OAMADDR
         OAMADDR = data;
         break;
-    case 0x2004: // OAMDATA
+    case 0x0004: // OAMDATA
         ptr_sprite[OAMADDR++] = data;
         break;
-    case 0x2005: // PPUSCROLL
+    case 0x0005: // PPUSCROLL
         if (w == 0)
         {
             x = data & 0x07;
@@ -94,7 +94,7 @@ IRAM_ATTR void Ppu2C02::cpuWrite(uint16_t addr, uint8_t data)
         }
         w = ~w;
         break;
-    case 0x2006: // PPUADDR
+    case 0x0006: // PPUADDR
         if (w == 0)
         {
             t.reg = (t.reg & 0x00FF) | (uint16_t)((data & 0x3F) << 8);
@@ -106,7 +106,7 @@ IRAM_ATTR void Ppu2C02::cpuWrite(uint16_t addr, uint8_t data)
         }
         w = ~w;
         break;
-    case 0x2007: // PPUDATA
+    case 0x0007: // PPUDATA
         ppuWrite(v.reg, data);
         v.reg += (control.VRAM_addr_increment ? 32 : 1);
         break;
@@ -118,15 +118,15 @@ IRAM_ATTR uint8_t Ppu2C02::cpuRead(uint16_t addr)
     uint8_t data = 0x00;
     switch (addr)
     {
-    case 0x2002: // PPUSTATUS
+    case 0x0002: // PPUSTATUS
         data = status.reg & 0xE0;
         status.VBlank = 0;
         w = 0;
         break;
-    case 0x2004: // OAMDATA
+    case 0x0004: // OAMDATA
         data = ptr_sprite[OAMADDR];
         break;
-    case 0x2007: // PPUDATA
+    case 0x0007: // PPUDATA
         data = PPUDATA_buffer;
         PPUDATA_buffer = ppuRead(v.reg);
 

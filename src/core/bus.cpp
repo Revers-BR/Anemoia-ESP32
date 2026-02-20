@@ -21,7 +21,7 @@ IRAM_ATTR void Bus::cpuWrite(uint16_t addr, uint8_t data)
     }
     else if ((addr & 0xE000) == 0x2000)
     {
-        ppu.cpuWrite(addr, data);
+        ppu.cpuWrite(addr & 0x0007, data);
     }
     else if ((addr & 0xF000) == 0x4000 && (addr <= 0x4013 || addr == 0x4015 || addr == 0x4017))
     {
@@ -52,7 +52,7 @@ IRAM_ATTR uint8_t Bus::cpuRead(uint16_t addr)
     }
     else if ((addr & 0xE000) == 0x2000)
     {
-        data = ppu.cpuRead(addr);
+        data = ppu.cpuRead(addr & 0x0007);
     }
     else if (addr == 0x4016)
     {
