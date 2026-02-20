@@ -130,7 +130,7 @@ IRAM_ATTR uint8_t Ppu2C02::cpuRead(uint16_t addr)
         data = PPUDATA_buffer;
         PPUDATA_buffer = ppuRead(v.reg);
 
-        if (v.reg >= 0x3F00 && v.reg <= 0x3FFF) data = PPUDATA_buffer;
+        if ((v.reg & 0x3F00) == 0x3F00) data = PPUDATA_buffer;
         v.reg += (control.VRAM_addr_increment ? 32 : 1);
         break;
     }
