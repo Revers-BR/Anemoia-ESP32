@@ -399,6 +399,7 @@ inline void Apu2A03::generateSample()
 	sample += prev_sample;
 	sample >>= 1;
 	sample &= 0xFF;
+	prev_sample = sample;
     audio_buffer[index] = sample << 8;	
 
 	// Reset audio buffer index once filled
