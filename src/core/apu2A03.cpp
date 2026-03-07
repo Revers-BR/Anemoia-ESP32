@@ -379,11 +379,8 @@ IRAM_ATTR void Apu2A03::clock()
 
 inline void Apu2A03::generateSample()
 {
-	#if DAC_PIN == 0
-    	uint16_t index = (buffer_index << 1); 
-	#elif DAC_PIN == 1
-    	uint16_t index = (buffer_index << 1) + 1; 
-	#endif
+	uint16_t index = (buffer_index << 1); 
+
 	uint16_t sample = 0;
 	sample += pulse1.seq.output ? pulse1.env.output : 0;
 	sample += pulse2.seq.output ? pulse2.env.output: 0;
@@ -400,7 +397,10 @@ inline void Apu2A03::generateSample()
 	sample >>= 1;
 	sample &= 0xFF;
 	prev_sample = sample;
-    audio_buffer[index] = sample << 8;	
+	
+	sample <<= 8;
+    audio_buffer[index] = sample;	
+    audio_buffer[index + 1] = sample;	
 
 	// Reset audio buffer index once filled
 	buffer_index++;
