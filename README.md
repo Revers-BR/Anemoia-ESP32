@@ -161,6 +161,39 @@ Most controllers should work fine from 3.3V power supply.
 
 ---
 
+## Controls
+
+### Menu Access
+Press **Start + Select** simultaneously in a game to open the menu.
+
+### Controller Button Mappings
+
+#### SNES Controller
+| NES Button | SNES Buttons |
+|------------|--------------|
+| A          | B, A, R      |
+| B          | Y, X, L      |
+| Start      | Start        |
+| Select     | Select       |
+| Up         | D-Pad Up     |
+| Down       | D-Pad Down   |
+| Left       | D-Pad Left   |
+| Right      | D-Pad Right  |
+
+#### PS1/PS2 Controller
+| NES Button | PS1/PS2 Buttons              |
+|------------|------------------------------|
+| A          | R1, R2, R3, X, O             |
+| B          | L1, L2, L3, Square, Triangle |
+| Start      | Start                        |
+| Select     | Select                       |
+| Up         | D-Pad Up                     |
+| Down       | D-Pad Down                   |
+| Left       | D-Pad Left                   |
+| Right      | D-Pad Right                  |
+
+---
+
 ## Getting Started
 
 1. Build and upload the `Anemoia-ESP32.ino` program into the ESP32.
