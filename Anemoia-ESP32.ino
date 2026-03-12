@@ -8,6 +8,7 @@
 
 #include "src/core/bus.h"
 #include "src/controller.h"
+#include "src/debug.h"
 #include "src/ui.h"
 #include "config.h"
 #include "hwconfig.h"
@@ -146,7 +147,7 @@ IRAM_ATTR void emulate()
             if ((frame_count & 63) == 0)
             {
                 float avg_fps = (1000000.0 * frame_count) / total_frame_time;
-                Serial.printf("FPS: %.2f\n", avg_fps);
+                LOGF("FPS: %.2f\n", avg_fps);
                 total_frame_time = 0;
                 frame_count = 0;
             }
@@ -156,7 +157,7 @@ IRAM_ATTR void emulate()
 
         // Frame limiting
         uint64_t now = esp_timer_get_time();
-        if (now < next_frame) ets_delay_us(next_frame - now);
+        // if (now < next_frame) ets_delay_us(next_frame - now);
         next_frame += FRAME_TIME;
     }
     #undef FRAME_TIME
@@ -164,13 +165,11 @@ IRAM_ATTR void emulate()
 
 bool initSD() 
 {
-    Serial.println("Initializing SD...");
+    LOG("Initializing SD...");
     SD_SPI.begin(SD_SCLK_PIN, SD_MISO_PIN, SD_MOSI_PIN, SD_CS_PIN);
     if (!SD.begin(SD_CS_PIN, SD_SPI, hw_config.sd_freq * 1000000)) 
     {
-        #ifdef DEBUG
-            Serial.println("SD Card Mount Failed");
-        #endif
+        LOG("SD Card Mount Failed");
 
         screen.setTextSize(2);
         const char* txt1 = "SD Init failed!";
@@ -240,7 +239,7 @@ void setupI2SDAC()
 
     esp_err_t err = i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL);
     if (err != ESP_OK) {
-        Serial.printf("I2S install failed: %d\n", err);
+        LOGF("I2S install failed: %d\n", err);
         return;
     }
 

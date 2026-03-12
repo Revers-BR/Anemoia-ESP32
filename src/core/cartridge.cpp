@@ -62,7 +62,7 @@ Cartridge::Cartridge(const char* filename)
         CRC32 = crc32(buf, len, CRC32);
     }
     CRC32 ^= ~0U;
-    Serial.printf("CRC32: %08X\n", CRC32);
+    LOGF("CRC32: %08X\n", CRC32);
 }
 
 Cartridge::~Cartridge()

@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include "config.h"
 #include "cartridge.h"
+#include "../debug.h"
 #include "cpu6502.h"
 #include "ppu2C02.h"
 
