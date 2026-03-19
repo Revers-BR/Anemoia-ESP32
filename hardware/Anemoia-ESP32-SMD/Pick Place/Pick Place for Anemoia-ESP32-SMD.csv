@@ -4,8 +4,8 @@ C:\Users\Public\Documents\Altium\Projects\Anemoia-ESP32-SMD\Project Outputs for 
 ========================================================================================================================
 File Design Information:
 
-Date:       18/03/26
-Time:       12:29
+Date:       19/03/26
+Time:       15:22
 Revision:   Not in VersionControl
 Variant:    No variations
 Units used: mm
@@ -20,14 +20,14 @@ Units used: mm
 "R7","1.5KO","TopLayer","RES_0603","30.6000mm","-13.4000mm","270","RES 1.5kO ±1% 100mW 0603","30.6000mm","-13.4000mm","30.6000mm","-12.7500mm"
 "R3","1.5KO","TopLayer","RES_0603","28.0750mm","-13.2500mm","270","RES 1.5kO ±1% 100mW 0603","28.0750mm","-13.2500mm","28.0750mm","-12.6000mm"
 "C16","0.1uF, 50V","TopLayer","CAP_CER_0603","33.5000mm","-5.6994mm","90","CAP CER 0.1UF 50V X7R 0603","33.5000mm","-5.6994mm","33.5000mm","-6.4000mm"
-"C15","0.1uF, 50V","TopLayer","CAP_CER_0603","24.7006mm","-5.5000mm","0","CAP CER 0.1UF 50V X7R 0603","24.7006mm","-5.5000mm","24.0000mm","-5.5000mm"
+"C15","0.1uF, 50V","TopLayer","CAP_CER_0603","25.2000mm","-8.8000mm","90","CAP CER 0.1UF 50V X7R 0603","25.2000mm","-8.8000mm","25.2000mm","-9.5006mm"
 "C4","1uF, 35V","TopLayer","CAP_CER_SAMSUNG_0402","79.1000mm","-34.2000mm","0","CAP CER 1uF 35V ±10% X5R 0402","79.1000mm","-34.2000mm","78.4730mm","-34.2000mm"
 "D5","TPD1E01B04DPYR","TopLayer","X1-SON-2","19.7500mm","-9.5000mm","180","3.6VWM 9VC X1SON-2(0.6x1)","19.7500mm","-9.5000mm","20.2500mm","-9.5000mm"
 "D4","TPD1E01B04DPYR","TopLayer","X1-SON-2","17.5000mm","-9.5000mm","180","3.6VWM 9VC X1SON-2(0.6x1)","17.5000mm","-9.5000mm","18.0000mm","-9.5000mm"
 "PWR","1A, 6V","TopLayer","MK-12C02-G020","29.0000mm","-2.5000mm","180","Surface Mount, Right Angle 1A SPDT 6V Black 10,000 Cycles SMD,6.6x1.4mm Slide Switches RoHS","29.0000mm","-2.5000mm","31.2501mm","-3.9907mm"
 "T2","L8050QLT1G","TopLayer","SOT-23","36.2000mm","-48.8000mm","180","TRANS NPN 25V 800mA SOT-23","36.2000mm","-48.8000mm","35.2000mm","-47.8500mm"
 "R5","1.5KO","TopLayer","RES_0603","13.3000mm","-37.1500mm","90","RES 1.5kO ±1% 100mW 0603","13.3000mm","-37.1500mm","13.3000mm","-37.8000mm"
-"USB1","KH-TYPE-C-16P","TopLayer","USB-C-SMD_KH-TYPE-C-16P","18.5000mm","-5.2500mm","0","CONN RCPT Type-C 16POS SMD R/A","18.5000mm","-5.2500mm","22.8200mm","-7.0375mm"
+"USB1","KH-TYPE-C-16P","TopLayer","USB-C-SMD_KH-TYPE-C-16P","18.5000mm","-3.7000mm","0","CONN RCPT Type-C 16POS SMD R/A","18.5000mm","-3.7000mm","22.8200mm","-5.4875mm"
 "Up","TS-1187A-B-A-B","BottomLayer","SWITCH_TACTILE_SMD-4P,5.1X5.1MM","108.2500mm","-18.0000mm","270","Without Bracket 5.1mm 12V 5.1mm Round Button No SPST 50mA SMD-4P,5.1x5.1mm Tactile Switches RoHS","108.2500mm","-18.0000mm","106.3750mm","-15.0000mm"
 "U7","STC3115AIQT","TopLayer","DFN-10(2X3)","21.0762mm","-32.7500mm","180","Battery Fuel Gauge, Li-Ion, Li-Pol, 2.7V to 4.2V Supply, I2C Interface, DFN-10","21.0762mm","-32.7500mm","21.9025mm","-33.7500mm"
 "U6","BQ298018RUGR","TopLayer","X2-QFN-8(1.5X1.5)","11.3000mm","-37.7500mm","0","High-side protector for single-cell li-ion and li-polymer batteries 8-X2QFN -40 to 85","11.3000mm","-37.7500mm","10.6249mm","-37.2503mm"
@@ -66,8 +66,8 @@ Units used: mm
 "R8","1KO","TopLayer","RES_0402","17.1250mm","-14.5000mm","0","RES 1kO ±1% 62.5mW 0402","17.1250mm","-14.5000mm","16.7500mm","-14.5000mm"
 "R6","4.12KO","TopLayer","RES_0402","17.1250mm","-13.5000mm","0","RES 4.12kO ±1% 62.5mW 0402","17.1250mm","-13.5000mm","16.7500mm","-13.5000mm"
 "R2","1.18KO","TopLayer","RES_0402","24.5000mm","-13.5000mm","0","RES 1.18kO ±1% 62.5mW 0402","24.5000mm","-13.5000mm","24.1250mm","-13.5000mm"
-"R10","5.1KO","TopLayer","RES_0402","15.7000mm","-8.8000mm","0","RES 5.1kO ±1% 62.5mW 0402","15.7000mm","-8.8000mm","15.3250mm","-8.8000mm"
-"R9","5.1KO","TopLayer","RES_0402","21.4000mm","-8.8000mm","180","RES 5.1kO ±1% 62.5mW 0402","21.4000mm","-8.8000mm","21.7750mm","-8.8000mm"
+"R10","5.1KO","TopLayer","RES_0402","15.7000mm","-8.0000mm","0","RES 5.1kO ±1% 62.5mW 0402","15.7000mm","-8.0000mm","15.3250mm","-8.0000mm"
+"R9","5.1KO","TopLayer","RES_0402","21.3000mm","-8.0000mm","180","RES 5.1kO ±1% 62.5mW 0402","21.3000mm","-8.0000mm","21.6750mm","-8.0000mm"
 "R24","10KO","TopLayer","RES_0402","57.4000mm","-18.5750mm","90","RES 10K OHM 1% 1/16W 0402","57.4000mm","-18.5750mm","57.4000mm","-18.9500mm"
 "Q5","30V 4A","TopLayer","SOT-23","12.5500mm","-33.2500mm","180","MOSFET N-CH 30V SOT-23","12.5500mm","-33.2500mm","11.5500mm","-32.3000mm"
 "Q4","30V 4A","TopLayer","SOT-23","7.5500mm","-33.3000mm","180","MOSFET N-CH 30V SOT-23","7.5500mm","-33.3000mm","6.5500mm","-32.3501mm"
