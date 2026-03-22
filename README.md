@@ -112,6 +112,10 @@ Anemoia-ESP32 requires a dual-core ESP32 with a minimum of 1 MB flash memory and
   - PS1 controller
   - PS2 controller
 
+> [!NOTE]
+> ST7789-based displays are recommended as they seem to fare better with 80MHz SPI speeds and are the most compatible. ILI9341-based screens may experience screen problems at higher SPI speeds.
+
+
 ## Where to Buy
 These are the recommended parts to use for this project.<br>
 *These are affiliate links. Buying through them helps support me at no extra cost to you. Thank you for your support.*
