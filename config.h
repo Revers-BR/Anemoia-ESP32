@@ -28,7 +28,7 @@
 #define UP_BUTTON 15
 #define DOWN_BUTTON 5
 #define START_BUTTON 27
-#define SELECT_BUTTON 18
+#define SELECT_BUTTON 16
 
 // NES controller pins
 #define CONTROLLER_NES_CLK 22

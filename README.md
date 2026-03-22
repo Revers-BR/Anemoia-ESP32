@@ -158,16 +158,16 @@ These are the recommended parts to use for this project.<br>
 There are currently three input methods: Tactile push buttons, an NES/SNES controller, and a PS1/PS2 controller.
 
 ### Tactile Push Buttons
-| Signal   | ESP32 Pins     |
-|----------|----------------|
-| A        | GPIO19 & GND   |
-| B        | GPIO26 & GND   |
-| Left     | GPIO32 & GND    |
-| Right    | GPIO33 & GND   |
-| Up       | GPIO15 & GND   |
-| Down     | GPIO5 & GND    |
-| Start    | GPIO27 & GND   |
-| Select   | GPIO18 & GND   |
+| Signal   | ESP32 Pins           |
+|----------|----------------------|
+| A        | GPIO19 & GND         |
+| B        | GPIO26 & GND         |
+| Left     | GPIO32 & GND         |
+| Right    | GPIO33 & GND         |
+| Up       | GPIO15 & GND         |
+| Down     | GPIO5 & GND          |
+| Start    | GPIO27 & GND         |
+| Select   | GPIO16 (RX2) & GND   |
 <br>
 
 ### NES/SNES controller
