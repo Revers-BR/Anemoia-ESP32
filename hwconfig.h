@@ -31,8 +31,15 @@ inline HWConfig loadConfig()
 
     if (!LittleFS.begin()) 
     { 
-        LOG("LittleFS mount failed, using defines in config.h"); 
-        return cfg; 
+        LOG("LittleFS mount failed, attempting format..."); 
+        if (!LittleFS.format()) {
+            LOG("LittleFS.format() failed");
+            return cfg;
+        }
+        if (!LittleFS.begin(false, "/littlefs", 10, "spiffs")) {
+            LOG("LittleFS mount failed after format, using defines in config.h"); 
+            return cfg;
+        }
     }
     LOG("LittleFS mounted"); 
     File f = LittleFS.open("/hwconfig.bin", "r");
