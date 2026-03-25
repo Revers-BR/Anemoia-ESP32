@@ -251,7 +251,6 @@ No software installation required.
 > [!NOTE]
 > Web flashing requires a Chromium-based browser (Chrome, Edge, Opera) with WebSerial support. Firefox is not supported.
 
----
 
 ### Option 2 - Build from Source
 
