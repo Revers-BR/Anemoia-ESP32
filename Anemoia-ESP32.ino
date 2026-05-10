@@ -17,10 +17,6 @@
 #include "src/debug.h"
 #include "src/ui.h"
 
-#ifndef OPTIMIZATION_FLAGS
-    #error The optimization flags were not applied! Please refer to *Step 4* of the README how to build and upload section.
-#endif
-
 HWConfig hw_config;
 TFT_eSPI screen = TFT_eSPI();
 SPIClass SD_SPI(SD_SPI_PORT);
