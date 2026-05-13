@@ -29,7 +29,7 @@ public:
     Cartridge* selectGame();
     void pauseMenu(Bus* nes);
     void settingsMenu(Bus* nes);
-    
+
     void initializeSettings();
     void loadEmulatorSettings(Bus* nes);
     bool paused = false;
