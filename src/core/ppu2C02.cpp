@@ -423,7 +423,6 @@ inline void Ppu2C02::renderSprites()
 
 void Ppu2C02::fakeSpriteHit(uint16_t current_scanline)
 {
-    scanline = current_scanline;
     if (mask.render_background || mask.render_sprite) cart->ppuScanline();
     if (!mask.render_sprite || status.sprite_zero_hit) return;
 
@@ -431,6 +430,7 @@ void Ppu2C02::fakeSpriteHit(uint16_t current_scanline)
     offset = (control.sprite_table_addr ? 0x1000 : 0);
     sprite_size = (control.sprite_size ? 16 : 8);
 
+    scanline = current_scanline;
     uint8_t sprite_y;
     sprite_y = sprite[0].y + 1;
     // Check if sprite is in scanline
