@@ -47,7 +47,6 @@ IRAM_ATTR uint8_t Bus::cpuRead(uint16_t addr)
 
 void Bus::reset()
 {
-    ptr_screen->fillScreen(TFT_BLACK);
     for (auto& i : RAM) i = 0x00;
     cart->reset();
     cpu.reset();

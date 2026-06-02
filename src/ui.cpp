@@ -130,6 +130,7 @@ Cartridge* UI::selectGame()
             std::string game = "/" + files[selected];
             std::vector<std::string>().swap(files);
             ROMBackend backend = (ROMBackend)settings.rom_backend;
+            screen->fillScreen(TFT_BLACK);
             return new Cartridge(game.c_str(), backend);
         }
     }
