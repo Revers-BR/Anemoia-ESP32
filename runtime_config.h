@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "src/debug.h"
+#include <FS.h>
 #include <LittleFS.h>
 
 struct __attribute__((packed)) RuntimeConfig
