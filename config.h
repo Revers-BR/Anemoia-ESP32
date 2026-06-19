@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 // Uncomment if you are using composite video output instead of a TFT display
-#define COMPOSITE_VIDEO
+// #define COMPOSITE_VIDEO
 #define VIDEO_STANDARD 1 // 0 = PAL, 1 = NTSC
 #define AUDIO_PIN      18
 
